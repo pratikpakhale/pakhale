@@ -1,0 +1,56 @@
+name: release
+
+on:
+  push:
+    branches: [main]
+
+# Only one release in flight at a time; never cancel a publish midway.
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions: {}
+
+jobs:
+  # Accumulates conventional commits into a release PR. Merging that PR is the
+  # explicit go-ahead: it tags, writes CHANGELOG.md, and cuts the GitHub release.
+  release-please:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    outputs:
+      released: ${{ steps.release.outputs.release_created }}
+      tag: ${{ steps.release.outputs.tag_name }}
+    steps:
+      - uses: googleapis/release-please-action@v4
+        id: release
+
+  # Runs only on the push that merged the release PR.
+  publish:
+    needs: release-please
+    if: needs.release-please.outputs.released == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # mints the OIDC token npm exchanges for publish rights
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.release-please.outputs.tag }}
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      # Trusted publishing needs npm >= 11.5.1 on Node >= 22.14.0.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm install -g npm@latest
+
+      - run: bun install --frozen-lockfile
+
+      # prepublishOnly gates the release on typecheck + tests + a clean build.
+      # No NPM_TOKEN: OIDC covers auth, and provenance is attached automatically.
+      - run: npm publish

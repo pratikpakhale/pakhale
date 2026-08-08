@@ -1,0 +1,50 @@
+{
+  "name": "pakhale",
+  "version": "0.1.0",
+  "description": "Pratik's personal CLI — coding-agent workflow setup and more",
+  "type": "module",
+  "license": "MIT",
+  "author": "Pratik Pakhale",
+  "homepage": "https://github.com/pratikpakhale/pakhale#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pratikpakhale/pakhale.git"
+  },
+  "bugs": {
+    "url": "https://github.com/pratikpakhale/pakhale/issues"
+  },
+  "keywords": [
+    "cli",
+    "claude-code",
+    "opencode",
+    "coding-agent",
+    "agent-skills",
+    "mcp",
+    "dotfiles",
+    "setup"
+  ],
+  "bin": {
+    "pakhale": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "skills",
+    "assets"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "test": "bun test --timeout 20000",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "bun run typecheck && bun run test && bun run build"
+  },
+  "devDependencies": {
+    "@clack/prompts": "^1.7.0",
+    "@types/bun": "latest",
+    "picocolors": "^1.1.1",
+    "tsdown": "^0.15.0",
+    "typescript": "^5"
+  }
+}
