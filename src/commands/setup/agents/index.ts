@@ -8,6 +8,7 @@ import { isInteractive, multiSelect, shouldAsk } from '../../../util/prompt'
 import type { Command } from '../../index'
 import { applyAgents, isInstalled } from './apply'
 import { emitters } from './emitters'
+import { defaultResolver, forceResolver } from './resolve'
 import type { AgentId, EmitContext } from './types'
 
 const USAGE = `Usage: pakhale setup agents [plan] [options]
@@ -18,10 +19,14 @@ scripted runs apply to every configured agent.
 
   plan               dry run — show every change, write nothing
 
+Anything on the machine that setup did not write is a conflict: interactively you choose
+keep / use config / see the diff; piped runs keep the machine's version.
+
 Options:
   -n, --dry-run      same as plan
   -a, --agent <id>   target one agent (repeatable) — skips the prompt
       --all          every configured agent — skips the prompt
+      --force        resolve every conflict in the config's favour, no prompts
       --home <dir>   apply against a different home directory
   -h, --help         show this help`
 
@@ -36,6 +41,7 @@ export const agents: Command = {
         'dry-run': { type: 'boolean', short: 'n', default: false },
         agent: { type: 'string', short: 'a', multiple: true },
         all: { type: 'boolean', default: false },
+        force: { type: 'boolean', default: false },
         home: { type: 'string' },
         help: { type: 'boolean', short: 'h', default: false },
       },
@@ -74,7 +80,7 @@ export const agents: Command = {
     console.log(`\npakhale setup agents${mode}${where} → ${selected.join(', ')}`)
 
     const ctx: EmitContext = { home, repoRoot: packageRoot, config }
-    await applyAgents(ctx, selected, dryRun)
+    await applyAgents(ctx, selected, dryRun, values.force ? forceResolver : defaultResolver())
 
     console.log(
       dryRun ? `\n${pc.yellow('dry run complete — nothing written')}\n` : `\n${pc.green('done')}\n`,

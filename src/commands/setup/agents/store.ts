@@ -1,6 +1,7 @@
 import { readdir } from 'node:fs/promises'
 import { join } from 'node:path'
 import type { Artifact, Plan } from './plan'
+import { stateFileFor } from './state'
 import type { EmitContext } from './types'
 
 export const AGENTS_STORE = '.agents/skills'
@@ -19,6 +20,7 @@ export async function buildStorePlan(ctx: EmitContext): Promise<Plan> {
 
   return {
     archiveDir,
+    stateFile: stateFileFor(ctx.home),
     groups: [
       {
         section: 'Skills store (~/.agents/skills)',

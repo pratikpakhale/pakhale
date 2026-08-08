@@ -43,6 +43,7 @@
   "devDependencies": {
     "@clack/prompts": "^1.7.0",
     "@types/bun": "latest",
+    "diff": "^9.0.0",
     "picocolors": "^1.1.1",
     "tsdown": "^0.15.0",
     "typescript": "^5"

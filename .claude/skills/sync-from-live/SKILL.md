@@ -14,6 +14,11 @@ Direction matters: this skill pulls **machine → repo**. The reverse (repo → 
 Drive toward that invariant. Never edit files under `~` to make the plan pass — fix the
 repo side, then let `bun src/cli.ts setup agents` reconcile the machine.
 
+Apply itself surfaces drift as **conflicts**: anything on the machine that setup did not
+write (tracked in `~/.agents/.setup-state.json`) prompts keep / use config / diff instead of
+being overwritten. Every conflict the plan or apply reports is a sync candidate for this
+skill — "keep" is the buy-time answer, adopting the change into the repo is the fix.
+
 ## Step 0 — read the current architecture first
 
 This repo's shape evolves. Before diffing anything, read `ARCHITECTURE.md`, `config.ts`, and
@@ -72,8 +77,10 @@ for another agent is a preference, not a limitation, so say why.
 | `mcpServers` / hooks / commands drift | Same managed-vs-ask split, per the current config vocabulary |
 
 **Never sync**: runtime state — sessions, history, caches, `installed_plugins.json`,
-plugin caches, `.setup-backups/`, or anything under `~/.claude.json` other than
-`mcpServers`. Derived keys (`enabledPlugins`, `extraKnownMarketplaces`, `statusLine`,
+plugin caches, `.setup-backups/`, `~/.agents/.setup-state.json` (setup's own record of
+what it last wrote — machine-local bookkeeping the conflict prompts read; deleting it is
+safe and just makes the next apply ask about everything that differs), or anything under
+`~/.claude.json` other than `mcpServers`. Derived keys (`enabledPlugins`, `extraKnownMarketplaces`, `statusLine`,
 `mcpServers`, and opencode's `plugin`/`mcp`) are never edited directly — change the
 `config.extensions` declaration they derive from instead. `known_marketplaces.json` and
 `.skill-lock.json` are read as *probes* and never written by setup: they are inputs to the

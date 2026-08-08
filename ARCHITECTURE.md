@@ -64,10 +64,30 @@ The emitter maps typed fields to raw `settings.json` keys (`effort` → `effortL
 1. **Plan** — `emitter.buildPlan(ctx)` returns inert data: `Artifact[]` grouped into sections.
    An artifact is `file`, `symlink`, `jsonMerge` (unmanaged keys preserved, managed keys from
    config, derived keys computed), or `install` (a command plus a **probe**).
-2. **Diff** — `diff(plan)` reads the machine and returns `Change[]`: `unchanged`, `blocked`,
-   or `pending` with the `Action` that would fix it. It imports nothing that writes, so
-   dry-run purity is structural rather than a flag every function must remember.
+2. **Diff** — `diff(plan, state)` reads the machine and returns `Change[]`: `unchanged`,
+   `blocked`, `pending` with the `Action` that would fix it, or `conflict`. It imports
+   nothing that writes, so dry-run purity is structural rather than a flag every function
+   must remember.
 3. **Commit or render** — `runPlan` consults `dryRun` exactly once.
+
+## Conflicts
+
+`~/.agents/.setup-state.json` records a hash of everything setup last wrote — whole files
+for `file` artifacts, per managed key for `jsonMerge` ones (other programs legitimately
+rewrite the rest of those files, so whole-file hashes would cry wolf). The dpkg-conffile
+rule follows: machine ≠ config is only a **conflict** when the machine also differs from
+that record. Config edits converge silently; live machine edits — deleting a file or key
+setup once wrote counts — and foreign files prompt.
+
+A `conflict` carries two ready-made outcomes and the executor asks a `Resolver` — created
+once per run in `applyAgents` so "…for all remaining" answers stick across agents — which
+one to perform: **apply** (config wins; the displaced version is always backed up) or
+**keep** (for `jsonMerge`, their values for the contested keys with everything else still
+applied; elsewhere, do nothing). Interactive runs prompt keep / apply / show-diff; piped
+runs keep, dpkg's safe default; `--force` applies. "Keep" is deliberately per-run — state
+only ever records what setup itself wrote, so a kept conflict asks again next time instead
+of being silently adopted. Adopting it for real is `sync-from-live`'s job. Deleting the
+state file is safe: the next apply just asks about everything that differs.
 
 Probes are what make installs converge — `claude plugin list`, `known_marketplaces.json`,
 `.skill-lock.json` — instead of reporting *would install …* forever. One exception, by design:
@@ -101,7 +121,9 @@ src/
         installs.ts      installer commands + their probes, as artifacts
         plan.ts          Artifact / Plan data types
         diff.ts          desired minus actual → Change[]  (reads only, never writes)
-        executor.ts      renders the diff or commits it
+        state.ts         the last-written record behind conflict detection
+        resolve.ts       conflict resolvers — interactive prompt, keep, force
+        executor.ts      renders the diff or commits it, resolving conflicts
         apply.ts         validate, shared store plan, then per agent
         store.ts         the agent-neutral ~/.agents/skills store plan
         emitters/        one per agent — id, configDir, buildPlan. No execution.
@@ -119,9 +141,11 @@ resolves relative to the installed package root, so `npx pakhale setup agents` w
   Comparison is key-order insensitive.
 - **Merge, never clobber.** Keys not named in `config.ts` are preserved. `enabledPlugins`,
   `extraKnownMarketplaces`, `mcpServers`, and opencode's `plugin`/`mcp` are *derived* and
-  owned outright — anything added live and never adopted here is removed on the next apply,
-  which is what `sync-from-live` is for.
-- **A config that will not parse is left alone**, rather than silently flattened.
+  repo-owned — but even those are never overwritten silently: anything setup did not write
+  is a conflict (see above), resolved by a prompt, kept when piped, or taken by `--force`.
+  Adopting a kept change for real is what `sync-from-live` is for.
+- **A config that will not parse — or is not a JSON object** (`null`, an array) — **is left
+  alone**, rather than silently flattened.
 - **A missing installer blocks one artifact, not the run.**
 - **Backups** land in `.setup-backups/<timestamp>/`, always *outside* skill scan paths.
 - **Detection.** An agent with no config directory is skipped, not created.
@@ -129,11 +153,19 @@ resolves relative to the installed package root, so `npx pakhale setup agents` w
 ## Testing
 
 `test/plan.test.ts` asserts on `buildPlan`'s data — no sandbox, no writes.
+`test/diff.test.ts` pins the three-way conflict matrix cell by cell — (machine, last-written
+record, config) → unchanged / pending / conflict / blocked — on hand-built plans in a temp dir.
 `test/prompt.test.ts` covers `shouldAsk` — the gate that decides *whether* to prompt. The picker
 itself is `@clack/prompts` (bundled, like `picocolors`, so the package ships no runtime deps);
-a raw-mode TUI can't be driven from a test, so the decision is what's pinned down.
+a raw-mode TUI can't be driven from a test, so the decision is what's pinned down. The same
+split governs `test/resolve.test.ts`: the resolver takes its ask function as a parameter, so
+everything around the picker — options offered, sticky "…all remaining", cancel-means-keep —
+is pinned without a TTY.
 `test/claude-code.test.ts` and `test/opencode.test.ts` run `applyAgents` against a **sandbox
-HOME** and assert on the real filesystem, so what passes is what a fresh machine gets. Two
+HOME** and assert on the real filesystem, so what passes is what a fresh machine gets;
+`test/conflicts.test.ts` does the same for every conflict flow — foreign files, live edits,
+state loss and corruption, keep/force, and the `--force` CLI wiring — with injected resolvers
+standing in for the prompt. Two
 seams make that work: `EmitContext.home` is injected (`--home <dir>` exposes it on the CLI),
 and `test/sandbox.ts` puts fake `claude`/`npx` shims on `PATH` that log their argv.
 

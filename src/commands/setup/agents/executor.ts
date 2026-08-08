@@ -1,15 +1,21 @@
 import { readFile, rename, rm, symlink, writeFile } from 'node:fs/promises'
 import { dirname } from 'node:path'
 import { run } from '../../../util/exec'
-import { backup, ensureDir, writeJson } from '../../../util/fs'
+import { backup, ensureDir, stable, writeJson } from '../../../util/fs'
 import { log } from '../../../util/log'
-import { diff, type Action, type Change, type Section } from './diff'
+import { diff, type Action, type Change, type Section, type StateRecord } from './diff'
 import type { Plan } from './plan'
+import type { Resolver } from './resolve'
+import { loadState, saveState, type SetupState } from './state'
 
 /** The one place `dryRun` is consulted: the same diff is either printed or committed. */
-export async function runPlan(plan: Plan, dryRun: boolean) {
-  const sections = await diff(plan)
-  await walk(sections, dryRun ? render : commit)
+export async function runPlan(plan: Plan, dryRun: boolean, resolve: Resolver) {
+  const state = await loadState(plan.stateFile)
+  const before = stable(state)
+  const sections = await diff(plan, state)
+
+  await walk(sections, dryRun ? render : (change) => commit(change, state, resolve))
+  if (!dryRun && stable(state) !== before) await saveState(plan.stateFile, state)
 }
 
 async function walk(sections: Section[], handle: (change: Change) => void | Promise<void>) {
@@ -28,31 +34,62 @@ function render(change: Change) {
     case 'pending':
       log.plan(phrase(change.action))
       for (const note of change.notes ?? []) log.info(note)
+      return
+    case 'conflict':
+      log.warn(`conflict: ${change.label} — ${change.summary}`)
+      log.info('will ask keep / use config / show diff (piped runs keep; --force uses config)')
   }
 }
 
-async function commit(change: Change) {
+async function commit(change: Change, state: SetupState, resolve: Resolver) {
   switch (change.status) {
     case 'unchanged':
+      record(state, change.record)
       return log.skip(`${change.label} (unchanged)`)
     case 'blocked':
       return log.fail(`${change.label} — ${change.reason}, leaving it alone`)
     case 'pending': {
       const { ok, notes } = await perform(change.action)
       if (!ok) return log.fail(`${change.label}: ${notes.join(' ')}`)
+      record(state, change.record)
       log.ok(change.label)
       for (const note of [...notes, ...(change.notes ?? [])]) log.info(note)
+      return
+    }
+    case 'conflict': {
+      const outcome = (await resolve(change)) === 'apply' ? change.apply : change.keep
+      if (!outcome) {
+        return log.warn(
+          `${change.label} — ${change.summary}; kept as-is (resolve interactively or with --force)`,
+        )
+      }
+      const { ok, notes } = await perform(outcome.action)
+      if (!ok) return log.fail(`${change.label}: ${notes.join(' ')}`)
+      record(state, outcome.record)
+      log.ok(change.label)
+      for (const note of [...notes, ...(outcome.notes ?? [])]) log.info(note)
     }
   }
+}
+
+function record(state: SetupState, entry?: StateRecord) {
+  if (!entry) return
+  if ('hash' in entry) state.files[entry.file] = entry.hash
+  else state.keys[entry.file] = { ...state.keys[entry.file], ...entry.keys }
 }
 
 async function perform(action: Action): Promise<{ ok: boolean; notes: string[] }> {
   switch (action.do) {
     case 'write-file': {
+      const notes: string[] = []
+      if (action.backupTo) {
+        const bak = await backup(action.dest, action.backupTo)
+        if (bak) notes.push(`backed up → ${bak}`)
+      }
       const bytes = await readFile(action.src)
       await ensureDir(dirname(action.dest))
       await writeFile(action.dest, bytes, action.mode ? { mode: action.mode } : undefined)
-      return { ok: true, notes: [] }
+      return { ok: true, notes }
     }
 
     case 'link': {

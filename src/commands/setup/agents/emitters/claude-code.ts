@@ -3,6 +3,7 @@ import { join, resolve } from 'node:path'
 import { claudePluginDeliveries, mcpServersFor } from '../extensions'
 import { claudePluginInstalls, skillInstalls } from '../installs'
 import type { Artifact, ArtifactGroup, Plan } from '../plan'
+import { stateFileFor } from '../state'
 import { AGENTS_STORE, authoredSkillNames } from '../store'
 import type {
   ClaudeCodeConfig,
@@ -98,7 +99,7 @@ export async function buildPlan(ctx: EmitContext): Promise<Plan> {
     })
   }
 
-  return { archiveDir, groups }
+  return { archiveDir, stateFile: stateFileFor(ctx.home), groups }
 }
 
 export function enabledPluginsMap(deliveries: ClaudePluginDelivery[]) {

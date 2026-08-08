@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url'
 import { config } from '../config'
 import { applyAgents } from '../src/commands/setup/agents/apply'
 import { claudePluginDeliveries, skillDeliveries } from '../src/commands/setup/agents/extensions'
+import { forceResolver } from '../src/commands/setup/agents/resolve'
 import type { EmitContext, SetupConfig } from '../src/commands/setup/agents/types'
 import { makeSandbox, type Sandbox } from './sandbox'
 
@@ -111,7 +112,8 @@ describe('claude-code emitter', () => {
     await mkdir(victim, { recursive: true })
     await writeFile(join(victim, 'SKILL.md'), 'original content')
 
-    await apply(sbx)
+    // displacing a real directory is a conflict — force resolves it in config's favour
+    await applyAgents(ctxFor(sbx), ['claude-code'], false, forceResolver)
 
     const skills = await sbx.tree('.claude/skills')
     expect(skills.some((p) => p.includes('.bak'))).toBe(false)

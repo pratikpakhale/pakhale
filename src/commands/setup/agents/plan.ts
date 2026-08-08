@@ -53,5 +53,7 @@ export interface ArtifactGroup {
 
 export interface Plan {
   archiveDir: string
+  /** Where the last-written record lives — how the diff tells our old writes from live edits. */
+  stateFile: string
   groups: ArtifactGroup[]
 }

@@ -43,6 +43,7 @@ me about every gap at once.
 - `plan` or `-n, --dry-run` — show every change, write nothing
 - `-a, --agent <id>` — set up one agent (repeatable)
 - `--all` — every configured agent, no prompt
+- `--force` — resolve every conflict in the config's favour, no prompts
 - `--home <dir>` — apply against a different home directory
 - `-h, --help` — full usage
 
@@ -53,6 +54,10 @@ Piped or scripted, it applies to every configured agent without asking.
 
 - **Re-running changes nothing.** Every artifact is checked before it is written, installers
   included.
+- **Nothing of yours is overwritten silently.** Setup remembers what it last wrote; anything
+  else it finds — an existing `CLAUDE.md`, a setting changed by hand — is a conflict, and it
+  asks: keep yours, use the config's (backed up first), or see the diff, with one answer for
+  all remaining if you prefer. Piped runs keep yours; `--force` takes the config's.
 - **Settings you added yourself survive.** Keys `config.ts` does not name are preserved.
 - **A config file it cannot parse is left alone** rather than flattened.
 - **Agents you do not have installed are skipped,** never created.

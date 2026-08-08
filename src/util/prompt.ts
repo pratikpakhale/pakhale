@@ -1,4 +1,4 @@
-import { cancel, isCancel, multiselect } from '@clack/prompts'
+import { cancel, isCancel, multiselect, select as clackSelect } from '@clack/prompts'
 
 export interface Choice {
   value: string
@@ -20,6 +20,20 @@ export async function multiSelect(message: string, choices: Choice[]): Promise<s
   if (isCancel(picked)) {
     cancel('cancelled')
     return []
+  }
+  return picked
+}
+
+/** One answer from a list. Cancelling returns null — the caller decides what safe means. */
+export async function select(message: string, choices: Choice[]): Promise<string | null> {
+  const picked = await clackSelect({
+    message,
+    options: choices.map((c) => ({ value: c.value, label: c.label, hint: c.hint })),
+  })
+
+  if (isCancel(picked)) {
+    cancel('cancelled')
+    return null
   }
   return picked
 }

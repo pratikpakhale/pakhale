@@ -3,6 +3,7 @@ import { exists } from '../../../../util/fs'
 import { mcpServersFor, opencodePluginPackages } from '../extensions'
 import { skillInstalls } from '../installs'
 import type { ArtifactGroup, Plan } from '../plan'
+import { stateFileFor } from '../state'
 import type { EmitContext, Emitter, McpServer, SetupConfig } from '../types'
 
 const CONFIG_DIR = '.config/opencode'
@@ -44,7 +45,7 @@ export async function buildPlan(ctx: EmitContext): Promise<Plan> {
     })
   }
 
-  return { archiveDir: join(root, '.setup-backups', stamp), groups }
+  return { archiveDir: join(root, '.setup-backups', stamp), stateFile: stateFileFor(ctx.home), groups }
 }
 
 async function configPath(root: string) {
