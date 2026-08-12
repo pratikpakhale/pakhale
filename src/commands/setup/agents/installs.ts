@@ -45,8 +45,10 @@ export function claudePluginInstalls(config: SetupConfig, home: string): Install
 }
 
 /**
- * skills.sh installs into the shared `~/.agents` store. `linkDir` is where the agent expects
- * to find each skill afterwards — omit it for agents that read the store directly.
+ * `linkDir` is where *this* agent expects to find each skill afterwards — the shared store
+ * itself for agents that read it directly. Always pass it: `.skill-lock.json` is one
+ * agent-agnostic file, so a name-only probe is satisfied by whichever agent installed first
+ * and every later agent's install is skipped forever, silently reporting `unchanged`.
  */
 export function skillInstalls(
   config: SetupConfig,

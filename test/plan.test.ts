@@ -324,7 +324,14 @@ describe('opencode plan', () => {
     expect(skills.every((a) => a.command.includes('-a') && a.command.includes('opencode'))).toBe(
       true,
     )
-    expect(skills.every((a) => a.probe.kind === 'skills' && !a.probe.linkDir)).toBe(true)
+    // The lockfile is agent-agnostic, so a name-only probe would be satisfied by whichever
+    // agent installed first and opencode's install would be skipped forever. It has to probe
+    // the store it actually reads.
+    expect(
+      skills.every(
+        (a) => a.probe.kind === 'skills' && a.probe.linkDir === join(home, '.agents/skills'),
+      ),
+    ).toBe(true)
     expect(plan.archiveDir.startsWith(join(home, '.config/opencode/.setup-backups/'))).toBe(true)
   })
 

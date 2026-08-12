@@ -4,6 +4,7 @@ import { mcpServersFor, opencodePluginPackages } from '../extensions'
 import { skillInstalls } from '../installs'
 import type { ArtifactGroup, Plan } from '../plan'
 import { stateFileFor } from '../state'
+import { AGENTS_STORE } from '../store'
 import type { EmitContext, Emitter, McpServer, SetupConfig } from '../types'
 
 const CONFIG_DIR = '.config/opencode'
@@ -23,7 +24,7 @@ export async function buildPlan(ctx: EmitContext): Promise<Plan> {
   const groups: ArtifactGroup[] = [
     {
       section: 'Skills (remote)',
-      artifacts: skillInstalls(ctx.config, 'opencode', ctx.home),
+      artifacts: skillInstalls(ctx.config, 'opencode', ctx.home, join(ctx.home, AGENTS_STORE)),
     },
     {
       section: 'Instructions',
