@@ -63,6 +63,10 @@ export const config: SetupConfig = {
       name: 'gh-stack',
       deliver: { all: { via: 'skills', repo: 'github/gh-stack', skills: ['gh-stack'] } },
     },
+    {
+      name: 'sitedrop',
+      deliver: { all: { via: 'skills', repo: 'pratikpakhale/sitedrop', skills: ['sitedrop'] } },
+    },
   ],
 
   authoredSkillsDir: 'skills',
