@@ -38,6 +38,19 @@ Agents package things differently, so each capability says how it reaches each a
 Leaving an agent undeclared is an error rather than a silent skip, so adding a new agent tells
 me about every gap at once.
 
+## Just the skills
+
+The skills in [`skills/`](skills/) are plain `SKILL.md` files, so they need neither this CLI
+nor my settings. Any agent that reads skills can install them straight from this repo:
+
+```bash
+npx skills add pratikpakhale/pakhale -g                    # all of them
+npx skills add pratikpakhale/pakhale -g -s deslop stackup  # or pick
+```
+
+`npx pakhale setup agents` stays the full path — the same skills plus plugins, MCP servers,
+instructions and settings.
+
 ## Options
 
 - `plan` or `-n, --dry-run` — show every change, write nothing

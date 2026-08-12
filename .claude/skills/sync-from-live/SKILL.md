@@ -1,6 +1,8 @@
 ---
 name: sync-from-live
 description: Detect drift between the live coding-agent state on this machine (~/.claude, ~/.agents, ~/.claude.json, ~/.config/opencode) and this repo's declarations, then adopt wanted changes back into config.ts, skills/, and assets/. Use when the user says sync, adopt, drift, "I changed my Claude/opencode settings/plugins/skills live", or wants machine state pulled back into the setup repo.
+metadata:
+  internal: true
 ---
 
 # Sync live agent state back into this repo
