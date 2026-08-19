@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0](https://github.com/pratikpakhale/pakhale/compare/v0.4.0...v0.5.0) (2026-08-19)
+
+
+### Features
+
+* **instructions:** route reports and questions through plannotator ([0c0edd0](https://github.com/pratikpakhale/pakhale/commit/0c0edd02874939e9ad274c9056d2f5e362bec4a8))
+
 ## [0.4.0](https://github.com/pratikpakhale/pakhale/compare/v0.3.0...v0.4.0) (2026-08-12)
 
 
