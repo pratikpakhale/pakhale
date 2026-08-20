@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.0](https://github.com/pratikpakhale/pakhale/compare/v0.5.0...v0.6.0) (2026-08-20)
+
+
+### Features
+
+* **config:** deliver the react-doctor skill to both agents ([709c45c](https://github.com/pratikpakhale/pakhale/commit/709c45c1729c66586f3baa6dfc9f234ca6ce9ad9))
+
 ## [0.5.0](https://github.com/pratikpakhale/pakhale/compare/v0.4.0...v0.5.0) (2026-08-19)
 
 
