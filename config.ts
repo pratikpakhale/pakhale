@@ -67,6 +67,10 @@ export const config: SetupConfig = {
       name: 'sitedrop',
       deliver: { all: { via: 'skills', repo: 'pratikpakhale/sitedrop', skills: ['sitedrop'] } },
     },
+    {
+      name: 'react-doctor',
+      deliver: { all: { via: 'skills', repo: 'millionco/react-doctor', skills: ['react-doctor'] } },
+    },
   ],
 
   authoredSkillsDir: 'skills',
