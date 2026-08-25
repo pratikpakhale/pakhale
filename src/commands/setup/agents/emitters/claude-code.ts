@@ -163,8 +163,10 @@ function settingsFor(cc: ClaudeCodeConfig): Record<string, unknown> {
   if (cc.voice !== undefined) out.voiceEnabled = cc.voice
   if (cc.autoDream !== undefined) out.autoDreamEnabled = cc.autoDream
   if (cc.agentPushNotifications !== undefined) out.agentPushNotifEnabled = cc.agentPushNotifications
-  if (cc.permissions?.defaultMode !== undefined)
-    out.permissions = { defaultMode: cc.permissions.defaultMode }
+  const permissions: Record<string, unknown> = {}
+  if (cc.permissions?.defaultMode !== undefined) permissions.defaultMode = cc.permissions.defaultMode
+  if (cc.permissions?.deny !== undefined) permissions.deny = cc.permissions.deny
+  if (Object.keys(permissions).length) out.permissions = permissions
   if (cc.permissions?.skipDangerousModePrompt !== undefined)
     out.skipDangerousModePermissionPrompt = cc.permissions.skipDangerousModePrompt
   if (cc.permissions?.skipAutoPrompt !== undefined)

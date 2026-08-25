@@ -123,7 +123,7 @@ describe('fresh machine and state seeding', () => {
     const settings = await f.sbx.json<Record<string, unknown>>(SETTINGS)
     expect(settings.autoCompactWindow).toBe(250000)
     expect(settings.voiceEnabled).toBe(true)
-    expect(settings.permissions).toEqual({ defaultMode: 'auto' })
+    expect(settings.permissions).toEqual({ defaultMode: 'auto', deny: ['Artifact'] })
     expect(settings.statusLine).toEqual({
       type: 'command',
       command: `bash ${join(f.sbx.home, '.claude', 'statusline-command.sh')}`,

@@ -34,4 +34,8 @@ Use conventional commit messages (https://www.conventionalcommits.org/):
 
 1. Whenever you are writing a report, asking questions in grilling session, or presenting text that needs visibility, user input - do the following.
     - write the text output to a tmp file 
-    - use plannotator cli to open that file - `plannotator annotate {file_path}.md` 
+    - use plannotator cli to open that file - `plannotator annotate {file_path}.md`
+
+2. When I ask you to create, publish, deploy, or share an HTML page, prototype,
+static site, or "artifact" — anything that needs a shareable web
+page — use the `sitedrop` skill.

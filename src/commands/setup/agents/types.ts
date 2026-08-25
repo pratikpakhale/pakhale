@@ -77,6 +77,7 @@ export interface ClaudeCodePermissions {
   defaultMode?: string
   skipDangerousModePrompt?: boolean
   skipAutoPrompt?: boolean
+  deny?: string[]
 }
 
 export interface ClaudeCodeConfig {

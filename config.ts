@@ -88,6 +88,7 @@ export const config: SetupConfig = {
       defaultMode: 'auto',
       skipDangerousModePrompt: true,
       skipAutoPrompt: true,
+      deny: ['Artifact'],
     },
   },
 }
