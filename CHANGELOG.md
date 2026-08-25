@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.7.0](https://github.com/pratikpakhale/pakhale/compare/v0.6.0...v0.7.0) (2026-08-25)
+
+
+### Features
+
+* **agents:** route artefacts to sitedrop, deny native Artifact tool ([6d6a4a9](https://github.com/pratikpakhale/pakhale/commit/6d6a4a944ea7158c077d90792427049c0ce6222c))
+* **agents:** route artefacts to sitedrop, deny native Artifact tool ([83a7366](https://github.com/pratikpakhale/pakhale/commit/83a736677b20086d425047bea07c026e3228e6d5))
+
 ## [0.6.0](https://github.com/pratikpakhale/pakhale/compare/v0.5.0...v0.6.0) (2026-08-20)
 
 
