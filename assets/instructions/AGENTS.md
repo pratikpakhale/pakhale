@@ -32,10 +32,15 @@ Use conventional commit messages (https://www.conventionalcommits.org/):
 
 1. Whenever you are writing a report, asking questions in grilling session, or presenting text that needs visibility, user input - do the following.
     - write the text output to a tmp file 
-    - open it with `plannotator annotate {file_path}.md` using the Bash tool with
+    - open it with `plannotator annotate {file_path}.md --tailscale` using the Bash tool with
       `run_in_background: true` and `timeout: 7200000`. Never use a shell `&`,
       `nohup`, or `> /dev/null`: a detached process can't wake the session when
-      I submit. Then end the turn and wait for the task notification. Also type out the tailscale url in chat to open in other devices.
+      I submit. Always pass `--tailscale`: without it plannotator binds to
+      127.0.0.1 only and the tailnet URL is unreachable. Read the task's output
+      file for the `https://…ts.net:<port>` URL it prints and type it out in chat
+      so I can open it on other devices. Then end the turn and wait for the task notification.
+
+      By default open the url in this device.
 
 2. When I ask you to create, publish, deploy, or share an HTML page, prototype,
 static site, or "artifact" — anything that needs a shareable web
