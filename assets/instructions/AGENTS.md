@@ -24,9 +24,7 @@ Use conventional commit messages (https://www.conventionalcommits.org/):
 - Keep subject line under 72 chars, imperative mood, lowercase
 - Use body for details when needed, separated by blank line
 
-2. Dont use any kind of browser agent unless explicitly told you to do so. Even to test something, do not try to operate a browser.
-
-3. NEVER push changes to outward-facing/shared surfaces directly — ALWAYS show me the drafted change and wait for my explicit confirmation first. This covers PR titles/descriptions/comments, issue titles/descriptions/comments, commit messages, and anything written to GitHub, Linear, Slack, or any external service. "Update the PR description" (or similar) is a request to DRAFT it, not to apply it live. Prepare the change locally, show it to me, then apply only after I say go.
+2. NEVER push changes to outward-facing/shared surfaces directly — ALWAYS show me the drafted change and wait for my explicit confirmation first. This covers PR titles/descriptions/comments, issue titles/descriptions/comments, commit messages, and anything written to GitHub, Linear, Slack, or any external service. "Update the PR description" (or similar) is a request to DRAFT it, not to apply it live. Prepare the change locally, show it to me, then apply only after I say go.
 
 ---
 
@@ -34,7 +32,10 @@ Use conventional commit messages (https://www.conventionalcommits.org/):
 
 1. Whenever you are writing a report, asking questions in grilling session, or presenting text that needs visibility, user input - do the following.
     - write the text output to a tmp file 
-    - use plannotator cli to open that file - `plannotator annotate {file_path}.md`
+    - open it with `plannotator annotate {file_path}.md` using the Bash tool with
+      `run_in_background: true` and `timeout: 7200000`. Never use a shell `&`,
+      `nohup`, or `> /dev/null`: a detached process can't wake the session when
+      I submit. Then end the turn and wait for the task notification. Also type out the tailscale url in chat to open in other devices.
 
 2. When I ask you to create, publish, deploy, or share an HTML page, prototype,
 static site, or "artifact" — anything that needs a shareable web

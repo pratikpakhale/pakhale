@@ -78,7 +78,7 @@ export const config: SetupConfig = {
 
   claudeCode: {
     statuslineScript: 'assets/statusline/claude-code.sh',
-    autoCompactWindow: 250000,
+    autoCompactWindow: 300000,
     tui: 'fullscreen',
     cleanupPeriodDays: 14,
     voice: true,
