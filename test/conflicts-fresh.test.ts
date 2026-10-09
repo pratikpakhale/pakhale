@@ -121,7 +121,7 @@ describe('fresh machine and state seeding', () => {
 
     expect(await f.sbx.read(CLAUDEMD)).toBe(INSTRUCTIONS_V1)
     const settings = await f.sbx.json<Record<string, unknown>>(SETTINGS)
-    expect(settings.autoCompactWindow).toBe(250000)
+    expect(settings.autoCompactWindow).toBe(BASE.claudeCode.autoCompactWindow)
     expect(settings.voiceEnabled).toBe(true)
     expect(settings.permissions).toEqual({ defaultMode: 'auto', deny: ['Artifact'] })
     expect(settings.statusLine).toEqual({
@@ -333,7 +333,7 @@ describe('jsonMerge conflicts', () => {
     await apply(f, neverResolve()) // no managed key contested → no prompt
     const s = await f.sbx.json<Record<string, unknown>>(SETTINGS)
     expect(s.model).toBe('my-model')
-    expect(s.autoCompactWindow).toBe(250000)
+    expect(s.autoCompactWindow).toBe(BASE.claudeCode.autoCompactWindow)
   })
 
   test('live edit to a managed key conflicts, naming exactly that key', async () => {
@@ -384,7 +384,7 @@ describe('jsonMerge conflicts', () => {
     })
     await apply(f, scripted(['apply']))
 
-    expect((await f.sbx.json<Record<string, unknown>>(SETTINGS)).autoCompactWindow).toBe(250000)
+    expect((await f.sbx.json<Record<string, unknown>>(SETTINGS)).autoCompactWindow).toBe(BASE.claudeCode.autoCompactWindow)
     const backups = await backupsUnder(f.sbx, '.claude/.setup-backups')
     const bak = backups.find((b) => b.endsWith('settings.json'))
     expect(bak).toBeDefined()
@@ -652,7 +652,7 @@ describe('resolver mechanics across a run', () => {
 
     await apply(f, forceResolver)
     expect(await f.sbx.read(CLAUDEMD)).toBe(INSTRUCTIONS_V1)
-    expect((await f.sbx.json<Record<string, unknown>>(SETTINGS)).autoCompactWindow).toBe(250000)
+    expect((await f.sbx.json<Record<string, unknown>>(SETTINGS)).autoCompactWindow).toBe(BASE.claudeCode.autoCompactWindow)
     const backups = await backupsUnder(f.sbx, '.claude/.setup-backups')
     expect(backups.some((b) => b.endsWith('CLAUDE.md'))).toBe(true)
     expect(backups.some((b) => b.endsWith('settings.json'))).toBe(true)
