@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.2](https://github.com/pratikpakhale/pakhale/compare/v0.7.1...v0.7.2) (2026-10-09)
+
+
+### Tests
+
+* **conflicts:** assert autoCompactWindow against config, not a literal ([35ae57d](https://github.com/pratikpakhale/pakhale/commit/35ae57d1b18111b9e4a7e06444f24aabe205fa25))
+
 ## [0.7.1](https://github.com/pratikpakhale/pakhale/compare/v0.7.0...v0.7.1) (2026-10-09)
 
 
