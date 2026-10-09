@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.7.1](https://github.com/pratikpakhale/pakhale/compare/v0.7.0...v0.7.1) (2026-10-09)
+
+
+### Bug Fixes
+
+* **AGENTS.MD:** plannotator and browser use ([d45b374](https://github.com/pratikpakhale/pakhale/commit/d45b3746659a7e1b73ad9f0e97d1408cc698ef3c))
+* **agents:** require --tailscale for plannotator annotate ([bcc9029](https://github.com/pratikpakhale/pakhale/commit/bcc9029df6016abed2a3b5b36a073115bedec1e8))
+
 ## [0.7.0](https://github.com/pratikpakhale/pakhale/compare/v0.6.0...v0.7.0) (2026-08-25)
 
 
